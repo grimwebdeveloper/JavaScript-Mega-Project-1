@@ -1,11 +1,39 @@
 const global = {
   currentPage: window.location.pathname,
+  search: {
+    term: '',
+    type: '',
+    page: 1,
+    totalPage: 1,
+  },
+  api: {
+    apiKey: '8e910b8001b97796872ce25e3010e43b',
+    apiUrl: 'https://api.themoviedb.org/3/',
+  },
 };
+
+// Fetching function for search API data
+async function searchApiData() {
+  const API_KEY = global.api.apiKey;
+  const API_URL = global.api.apiUrl;
+
+  showSpinner(); // Show spinner before fetching data
+
+  const response = await fetch(
+    `${API_URL}search/${global.search.type}?api_key=${API_KEY}&language=en-US&query=${global.search.term}`
+  );
+  const data = await response.json();
+  console.log(data);
+
+  hideSpinner(); // Hide spinner after fetching data
+
+  return data;
+}
 
 // Fetching function to get data from the API
 async function fetchAPIdata(endpoint) {
-  const API_KEY = '8e910b8001b97796872ce25e3010e43b';
-  const API_URL = 'https://api.themoviedb.org/3/';
+  const API_KEY = global.api.apiKey;
+  const API_URL = global.api.apiUrl;
 
   showSpinner(); // Show spinner before fetching data
 
@@ -291,6 +319,18 @@ function initSwiper() {
   });
 }
 
+async function search() {
+  const queryString = window.location.search;
+  const urlParams = new URLSearchParams(queryString);
+  global.search.term = urlParams.get('search-term');
+  global.search.type = urlParams.get('type');
+  if (global.search.term !== '' && global.search.term !== null) {
+    const results = await searchApiData();
+  } else {
+    showAlert('Please enter a search term', 'error');
+  }
+}
+
 // Highlight the active link in the nav bar
 function highLightActiveLink() {
   const links = document.querySelectorAll('.nav-link');
@@ -299,6 +339,19 @@ function highLightActiveLink() {
       link.classList.add('active');
     }
   });
+}
+
+// Custom alert
+function showAlert(message, className) {
+  const alertEl = document.createElement('div');
+  alertEl.classList.add('alert', className);
+  alertEl.innerText = message;
+  document.querySelector('#alert').appendChild(alertEl);
+  setTimeout(() => {
+    alertEl.style.opacity = '0';
+    alertEl.style.transition = 'opacity 0.3s ease-out';
+    setTimeout(() => alertEl.remove(), 300);
+  }, 3000);
 }
 
 // Format numbers with commas
@@ -359,6 +412,7 @@ function init() {
 
     case '/search.html':
       console.log('Welcome to the search page!');
+      search();
       break;
     default:
       break;
