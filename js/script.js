@@ -228,6 +228,69 @@ async function displayShowDetails() {
   document.querySelector('#show-details').appendChild(div);
 }
 
+// Display movies in the slider on the home page
+async function displaySliderMovie() {
+  const { results } = await fetchAPIdata('movie/now_playing');
+  results.forEach((movie) => {
+    console.log(movie);
+    const div = document.createElement('div');
+    div.classList.add('swiper-slide');
+    const moviePoster = movie.poster_path
+      ? `<img
+      src="https://image.tmdb.org/t/p/w500${movie.poster_path}"
+      class="card-img-top"
+      alt="${movie.title}"
+    />`
+      : `<img
+      src="images/no-image.jpg"
+      class="card-img-top"
+      alt="${movie.title}"
+    />`;
+    div.innerHTML = `
+    <a href="movie-details.html?id=${movie.id}">
+      ${moviePoster}
+    </a>
+    <h4 class="swiper-rating">
+      <i class="fas fa-star text-secondary"></i> ${movie.vote_average.toFixed(
+        1
+      )} / 10
+    </h4>
+    `;
+    document.querySelector('.swiper-wrapper').appendChild(div);
+    initSwiper();
+  });
+}
+
+// Initialize Swiper
+function initSwiper() {
+  const swiper = new Swiper('.swiper', {
+    slidesPerView: 'auto', // Use 'auto' for better responsiveness
+    spaceBetween: 20, // Reduced space for smaller screens
+    freeMode: true,
+    loop: true,
+    autoplay: {
+      delay: 3000, // Faster autoplay for better engagement
+      disableOnInteraction: false,
+    },
+    breakpoints: {
+      320: { slidesPerView: 1 }, // Added breakpoint for very small screens
+      480: { slidesPerView: 1.5 }, // Adjusted for small devices
+      640: { slidesPerView: 2 }, // Adjusted for medium devices
+      768: { slidesPerView: 3 }, // Adjusted for tablets
+      1024: { slidesPerView: 4 }, // Adjusted for larger tablets
+      1200: { slidesPerView: 6 }, // Standard for desktops
+    },
+    pagination: {
+      el: '.swiper-pagination', // Added pagination for better navigation
+      clickable: true,
+    },
+    navigation: {
+      nextEl: '.swiper-button-next', // Added navigation buttons
+      prevEl: '.swiper-button-prev',
+    },
+  });
+}
+
 // Highlight the active link in the nav bar
 function highLightActiveLink() {
   const links = document.querySelectorAll('.nav-link');
@@ -275,6 +338,7 @@ function init() {
     case '/':
     case '/index.html':
       console.log('Welcome to the home page!');
+      displaySliderMovie();
       displayPopularMovies();
       break;
 
