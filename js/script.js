@@ -7,12 +7,27 @@ async function fetchAPIdata(endpoint) {
   const API_KEY = '8e910b8001b97796872ce25e3010e43b';
   const API_URL = 'https://api.themoviedb.org/3/';
 
+  showSpinner(); // Show spinner before fetching data
+
   const response = await fetch(
     `${API_URL}${endpoint}?api_key=${API_KEY}&language=en-US`
   );
   const data = await response.json();
   console.log(data);
+
+  hideSpinner(); // Hide spinner after fetching data
+
   return data;
+}
+
+function showSpinner() {
+  const spinner = document.querySelector('.spinner');
+  spinner.classList.add('show');
+}
+
+function hideSpinner() {
+  const spinner = document.querySelector('.spinner');
+  spinner.classList.remove('show');
 }
 
 // Display popular movies on the home page
@@ -51,6 +66,43 @@ async function displayPopularMovies() {
   });
 }
 
+// Display popular TV shows on the shows page
+async function displayPopularShows() {
+  const { results } = await fetchAPIdata('tv/popular');
+
+  results.forEach((show) => {
+    console.log(show)
+    const div = document.createElement('div');
+    div.classList.add('card');
+
+    const showPoster = show.poster_path
+      ? `<img
+          src="https://image.tmdb.org/t/p/w500${show.poster_path}"
+          class="card-img-top"
+          alt="${show.name}"
+        />`
+      : `<img
+          src="images/no-image.jpg"
+          class="card-img-top"
+          alt="${show.name}"
+        />`;
+
+    div.innerHTML = `
+      <a href="show-details.html?id=${show.id}">
+        ${showPoster}
+      </a>
+      <div class="card-body">
+        <h5 class="card-title">${show.name}</h5>
+        <p class="card-text">
+          <small class="text-muted">Air Date: ${show.first_air_date}</small>
+        </p>
+      </div>
+    `;
+
+    document.querySelector('#popular-shows').appendChild(div);
+  });
+}
+
 // Highlight the active link in the nav bar
 function highLightActiveLink() {
   const links = document.querySelectorAll('.nav-link');
@@ -72,6 +124,7 @@ function init() {
 
     case '/shows.html':
       console.log('Welcome to the shows page!');
+      displayPopularShows()
       break;
 
     case '/movie-details.html':
