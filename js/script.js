@@ -325,10 +325,54 @@ async function search() {
   global.search.term = urlParams.get('search-term');
   global.search.type = urlParams.get('type');
   if (global.search.term !== '' && global.search.term !== null) {
-    const results = await searchApiData();
+    const { results, page, total_pages } = await searchApiData();
+    if (results.length === 0) showAlert('No results found');
+    displaySearchResults(results);
+    document.querySelector('#search-term').value = '';
   } else {
-    showAlert('Please enter a search term', 'error');
+    showAlert('Please enter a search term');
   }
+}
+
+// Display search results
+function displaySearchResults(results) {
+  results.forEach((result) => {
+    console.log(result);
+    const div = document.createElement('div');
+    div.classList.add('card');
+
+    const resultPoster = result.poster_path
+      ? `<img
+          src="https://image.tmdb.org/t/p/w500${result.poster_path}"
+          class="card-img-top"
+          alt="${global.search.type === 'movie' ? result.title : result.name}"
+        />`
+      : `<img
+          src="images/no-image.jpg"
+          class="card-img-top"
+          alt="${global.search.type === 'movie' ? result.title : result.name}"
+        />`;
+
+    div.innerHTML = `
+      <a href="${global.search.type}-details.html?id=${result.id}">
+        ${resultPoster}
+      </a>
+      <div class="card-body">
+        <h5 class="card-title">${
+          global.search.type === 'movie' ? result.title : result.name
+        }</h5>
+        <p class="card-text">
+          <small class="text-muted">${
+            global.search.type === 'movie'
+              ? `Release: ${result.release_date}`
+              : `Air Date: ${result.first_air_date}`
+          }</small>
+        </p>
+      </div>
+    `;
+
+    document.querySelector('#search-results').appendChild(div);
+  });
 }
 
 // Highlight the active link in the nav bar
@@ -342,7 +386,7 @@ function highLightActiveLink() {
 }
 
 // Custom alert
-function showAlert(message, className) {
+function showAlert(message, className = 'error') {
   const alertEl = document.createElement('div');
   alertEl.classList.add('alert', className);
   alertEl.innerText = message;
