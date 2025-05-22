@@ -24,7 +24,7 @@ async function searchApiData() {
     `${API_URL}search/${global.search.type}?api_key=${API_KEY}&language=en-US&query=${global.search.term}&page=${global.search.page}`
   );
   const data = await response.json();
-  console.log(data);
+  // console.log(data);
 
   hideSpinner(); // Hide spinner after fetching data
 
@@ -42,7 +42,7 @@ async function fetchAPIdata(endpoint) {
     `${API_URL}${endpoint}?api_key=${API_KEY}&language=en-US`
   );
   const data = await response.json();
-  console.log(data);
+  // console.log(data);
 
   hideSpinner(); // Hide spinner after fetching data
 
@@ -164,7 +164,7 @@ async function displayPopularShows() {
   const { results } = await fetchAPIdata('tv/popular');
 
   results.forEach((show) => {
-    console.log(show);
+    // console.log(show);
     const div = document.createElement('div');
     div.classList.add('card');
 
@@ -261,7 +261,7 @@ async function displayShowDetails() {
 async function displaySliderMovie() {
   const { results } = await fetchAPIdata('movie/now_playing');
   results.forEach((movie) => {
-    console.log(movie);
+    // console.log(movie);
     const div = document.createElement('div');
     div.classList.add('swiper-slide');
     const moviePoster = movie.poster_path
@@ -345,7 +345,7 @@ function displaySearchResults(results) {
   document.querySelector('#search-results-heading').innerHTML = '';
   document.querySelector('#pagination').innerHTML = '';
   results.forEach((result) => {
-    console.log(result);
+    // console.log(result);
     const div = document.createElement('div');
     div.classList.add('card');
 
